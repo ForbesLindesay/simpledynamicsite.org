@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Dynamic Site</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Simple Dynamic Site</h1>
+      <p>
+        This guide currently assumes you have installed a recent version of node.js.  You can run your app for free, but
+        it will only be accessible for 18 hours per day.  This is intended so you can try things out.  You can upgrade
+        to the full 24 hour version for $7 per month (at time of writing).  I'm not getting sponsored by Heroku for this.
+      </p>
+      <h2>Step 1: Choose a domain name</h2>
+      <p>
+        You need to register your chosen domain name. I recommend <a href="https://www.namecheap.com/?aff=99746">namecheap</a>
+        for this.  They're both one of the cheapest, and have good security set up, which is very important for your domain
+        registrar.  Simply go to <a href="https://www.namecheap.com/?aff=99746">www.namecheap.com</a>, enter your domain
+        and click search, then follow the instructions to pay.
+      </p>
+      <p>
+        I recommend you pay the extra for "WhoisGuard" as without it you'll get a lot of spam.  If you don't have
+        WhoisGuard, your contact details will be publicly available to anyone who wants to know who owns the domain.
+      </p>
+      <h2>Step 2: Setup Cloudflare</h2>
+      <p>
+        This step <strong>can</strong> take a few days to fully complete, so you should start this as soon as you have
+        registered your website.  Sign up for a <a href="https://www.cloudflare.com">cloudflare account</a>.  Add your
+        newly registered domain to cloudflare.
+      </p>
+      <p>
+        Once cloudflare tells you to set your nameservers, you can go to your <a href="https://www.namecheap.com/?aff=99746">namecheap dashboard</a>
+        and click "Domain List" then "Manage" on your chosen domain.  From here, Choose "Custom DNS" under "NAMESERVERS",
+        then enter the two nameservers cloudflare tells you to.  I recommend refreshing the page to make sure the change
+        has been saved.
+      </p>
+      <p>
+        It typically takes about 30 minutes for cloudflare to recognise your change.  In the mean time, you can start
+        building your website.
+      </p>
+      <h2>Step 3: Create your website</h2>
+      <p>
+        Sign up for an account on <a href="https://github.com">GitHub</a> and create a new repository.  Use the domain
+        name you have chosen as the name of the repository.  If you don't already have it, install the <a href="https://desktop.github.com/">Github Desktop</a> app.
+        You can then use the app to "clone" your new repository.
+      </p>
+      <p>
+        Open the resulting folder, using your text editor of choice (I recommend <a href="https://atom.io/">Atom</a>).
+      </p>
+      <p>
+        Add a <code>.gitignore</code> that has the following contents:
+      </p>
+      <pre><code><file path="example/.gitignore"/></code></pre>
+      <p>
+        Add a package.json that has the following contents:
+      </p>
+      <pre><code class="language-json"><file path="example/package.json"/></code></pre>
+      <p>Then run <code>npm install</code> to install dependencies.</p>
+      <p>
+        Add a sever.js file containing:
+      </p>
+      <pre><code class="language-js"><file path="example/server.js"/></code></pre>
+      <p>
+        Add an index.html file with whatever content you want in it, e.g.
+      </p>
+      <pre><code class="language-html"><file path="example/index.html"/></code></pre>
+      <p>
+        Check that it works by running <code>node server</code> and navigating
+        to <a href="http://localhost:3000">http://localhost:3000</a>.
+        Now commit and push that code.
+      </p>
+      <h2>Step 4: Set up Heroku</h2>
+      <p>
+        Sign up for an account on <a href="https://www.heroku.com/">Heroku</a>.  Create a
+        <a href="https://dashboard.heroku.com/new">new app</a>.  Your app name can be any string of letters, hyphens and
+        numbers.  Note that you should update the <code>heroku-release --app example-app-name</code> command in your
+        package.json file with your chosen app name.
+      </p>
+      <h2>Step 5: Publishing to Heroku on Commit</h2>
+      <p>
+        Go to <a href="https://travis-ci.org/profile/">Travis CI</a> and enable it for your repository. Then click settings.
+      </p>
+      <p>
+        In a new tab, go to your <a href="https://dashboard.heroku.com/account">account page on heroku</a> and copy your
+        API Key.  <strong>Making sure that "Display value in build log" is set to "Off",</strong> add that API Key to
+        Environment Variables with a Name of "HEROKU_API_TOKEN".
+      </p>
+      <p>
+        Back in the repository, add a .travis.yml file containing:
+      </p>
+      <pre><code class="language-yaml"><file path="example/.travis.yml"/></code></pre>
+      <p>
+        Commit and push this new file and your site should get built
+        and uploaded by travis.  You should now be able to see your site at
+        <a href="https://example-app-name.herokuapp.com">example-app-name.herokuapp.com</a>.
+      </p>
+      <h2>Step 6: Set up cloudflare</h2>
+      <p>
+        Now that you have the site hosted on Heroku, all that remains is to fix
+        the URL so it is nice and memorable, and add support for https.
+      </p>
+      <p>
+        In cloudflare, edit the DNS records.  First, remove any existing "A" or "CNAME" records, then add two new "CNAME" records:
+      </p>
+      <ul>
+        <li><code>@</code> to <code>example-app-name.herokuapp.com</code></li>
+        <li><code>www</code> to <code>example-app-name.herokuapp.com</code></li>
+      </ul>
+      <p>Ensure cloudflare is enabled for both records</p>
+      <p>Go to "Page Rules" within cloudflare and add two new rules</p>
+      <ul>
+        <li>To make visitors use https, pattern <code>http://*example.com/*</code>, then enable "Always use https"</li>
+        <li>To redirect from www.example.com to example.com, Pattern <code>www.example.com/*</code>, then redirect to <code>https://example.com/$1</code></li>
+        <li>Or to redirect from example.com to www.example.com, pattern <code>example.com/*</code>, then redirect to <code>https://www.example.com/$1</code></li>
+      </ul>
+      <p>
+        Once those changes have propagated, you should be able to see your
+        website by navigating to <a href="https://example.com/">https://example.com/</a>.  It should also auto
+        update every time you push new changes to GitHub.
+      </p>
+    </div>
+    <script src="/js/prism.js"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "example.com",
+  "private": true,
+  "description": "A simple dynamic website",
+  "dependencies": {
+    "express": "^4.13.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo No Tests",
+    "deploy": "npm i heroku-release && heroku-release --app example-app-name"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/my_github_username/example.com.git"
+  },
+  "engines": {
+    "node": "5.11.0"
+  }
+}
